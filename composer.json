@@ -1,0 +1,8 @@
+{
+    "name": "entheospace/ecn",
+    "description": "ECN App",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
