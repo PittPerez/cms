@@ -177,6 +177,8 @@ $(document).on("click", "#add_btn", function () {
     var newMobile = $("#newMobile").val();
     var newEmail = $("#newEmail").val();
     var newCompany = $("#newCompany").val();
+    //intento img
+    var newImg = $("#newImg").val();
 
     $.post('contacts/controller/contacts_controller.php', {
         user_request: 'save_new_contact',
@@ -184,7 +186,8 @@ $(document).on("click", "#add_btn", function () {
         contact_fullname: newName,
         contact_mobile: newMobile,
         contact_email: newEmail,
-        contact_company: newCompany
+        contact_company: newCompany,
+        image_user: newImg
     }, function (data) {
         var response = JSON.parse(data);
         if (response.status == 'success'){

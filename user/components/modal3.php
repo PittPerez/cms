@@ -6,7 +6,7 @@
                 <button type="button" data-dismiss="modal" class="btn btn-secondary">
                     <i class="bi bi-arrow-left-short"></i>
                 </button>
-                <button type="button" class="btn btn-secondary" id="add_btn" data-id="<?=$contact_id?>"> confirm
+                <button type="button" class="btn btn-secondary" id="add_btn"> confirm
                 </button>
             </div>
             <div class="modal-body">
@@ -25,6 +25,10 @@
                 <div class="form-group">
                     <label>Company</label>
                     <input type="text" class="form-control" id="newCompany" placeholder="Company">
+                </div>
+                <div class="form-group">
+                    <label for="image_user">Choose a profile picture:</label>
+                    <input type="file" id="image_user" name="image_user" accept="image/png, image/jpeg" />
                 </div>
             </div>
         </div>
