@@ -290,6 +290,8 @@
                 $contact_mobile = filter_input(INPUT_POST, 'contact_mobile', FILTER_SANITIZE_STRING);
                 $contact_email = filter_input(INPUT_POST, 'contact_email', FILTER_SANITIZE_EMAIL);
                 $contact_company = filter_input(INPUT_POST, 'contact_company', FILTER_SANITIZE_STRING);
+                //intento img
+                $image_user = filter_input(INPUT_POST, 'image_user', FILTER_SANITIZE_STRING);
             
                 if ($contact_fullname && $contact_mobile && $contact_email && $contact_company) {
                     $created = create_contact($db, $contact_fullname, $contact_mobile, $contact_email, $contact_company);
