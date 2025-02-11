@@ -171,36 +171,45 @@ $(document).on("click", "#create_btn", function () {
 
 // Guardar nuevo contacto
 $(document).on("click", "#add_btn", function () {
-    var contactId = $(this).data("id");
+    var formData = new FormData();
+    formData.append("user_request", "save_new_contact");
+    formData.append("contact_fullname", $("#newName").val());
+    formData.append("contact_mobile", $("#newMobile").val());
+    formData.append("contact_email", $("#newEmail").val());
+    formData.append("contact_company", $("#newCompany").val());
 
-    var newName = $("#newName").val();
-    var newMobile = $("#newMobile").val();
-    var newEmail = $("#newEmail").val();
-    var newCompany = $("#newCompany").val();
-    //intento img
-    var newImg = $("#newImg").val();
+    var imageFile = $("#image_user")[0].files[0];
+    if (imageFile) {
+        formData.append("image_user", imageFile);
+    }
 
-    $.post('contacts/controller/contacts_controller.php', {
-        user_request: 'save_new_contact',
-        contact_id: contactId,
-        contact_fullname: newName,
-        contact_mobile: newMobile,
-        contact_email: newEmail,
-        contact_company: newCompany,
-        image_user: newImg
-    }, function (data) {
-        var response = JSON.parse(data);
-        if (response.status == 'success'){
-            fetch_all_contacts();
-            $('#Add_Contact').modal("hide");
-            $("#toast_container").html(response.view);
-            $('#toast_create_user').toast("show");
-        }else {
+    $.ajax({
+        url: 'contacts/controller/contacts_controller.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            var response = JSON.parse(data);
+            if (response.status == 'success') {
+                fetch_all_contacts();
+                $('#Add_Contact').modal("hide");
+                $("#toast_container").html(response.view);
+                $('#toast_create_user').toast("show");
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message
+                });
+            }
+        },
+        error: function () {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: response.message
+                text: 'Ocurrió un problema al guardar el contacto'
             });
-        }  
+        }
     });
 });

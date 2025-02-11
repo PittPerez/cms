@@ -1,5 +1,6 @@
 <?php
 
+
     require "../model/contacts_queries.php";
 
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -284,43 +285,55 @@
         break;
         
         case 'save_new_contact':
-            try{
+            try {
                 include '../../../utilities/db_conn.php';
+                
                 $contact_fullname = filter_input(INPUT_POST, 'contact_fullname', FILTER_SANITIZE_STRING);
                 $contact_mobile = filter_input(INPUT_POST, 'contact_mobile', FILTER_SANITIZE_STRING);
                 $contact_email = filter_input(INPUT_POST, 'contact_email', FILTER_SANITIZE_EMAIL);
                 $contact_company = filter_input(INPUT_POST, 'contact_company', FILTER_SANITIZE_STRING);
-                //intento img
-                $image_user = filter_input(INPUT_POST, 'image_user', FILTER_SANITIZE_STRING);
-            
+        
+                $image_path = null;
+                
+                if (!empty($_FILES['image_user']['name'])) {
+                    $target_dir = "../../../contacts_documents/";
+                    $file_name = basename($_FILES['image_user']['name']);
+                    $target_file = $target_dir . $file_name;
+                    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                    
+                    $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (in_array($imageFileType, $allowed_types) && $_FILES['image_user']['size'] < 5000000) { // 5MB máximo
+                        if (move_uploaded_file($_FILES['image_user']['tmp_name'], $target_file)) {
+                            $image_path = $target_file; // Guardamos la ruta en BD
+                        } else {
+                            echo json_encode(['status' => 'error', 'message' => 'Error al subir la imagen']);
+                            exit;
+                        }
+                    } else {
+                        echo json_encode(['status' => 'error', 'message' => 'Formato de imagen no válido o archivo demasiado grande']);
+                        exit;
+                    }
+                }
+        
                 if ($contact_fullname && $contact_mobile && $contact_email && $contact_company) {
-                    $created = create_contact($db, $contact_fullname, $contact_mobile, $contact_email, $contact_company);
+                    $created = create_contact($db, $contact_fullname, $contact_mobile, $contact_email, $contact_company, $image_path);
+                    
                     $content = '';
-                    ob_start(); 
-
+                    ob_start();
                     include "../../components/toast_create_user.php";
-
                     $content = ob_get_clean();
+                    
                     echo json_encode(['status' => 'success', 'view' => $content]);
                 } else {
-                    echo "invalid_data";
+                    echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
                 }
-            }catch (PDOException $e) {
-                //? Ocurre cuando hay un error en la base datos o en el modelo
+            } catch (PDOException $e) {
                 error_log('Database Error: ' . $e->getMessage());
-                $message = $development_mode ? 'Database error occurred: ' . $e->getMessage() : $user_message;
-                echo json_encode(['status' => 'error', 'message' => $message]);
-            } catch (ErrorException $e) {
-                //? Ocurre cuando convertimos un Warning a excepción, normal mente estos warnings php los ignora
-                error_log('Warning converted to Exception: ' . $e->getMessage());
-                $message = $development_mode ? $e->getMessage() : $user_message;
-                echo json_encode(['status' => 'error', 'message' => $message]);
+                echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos']);
             } catch (Exception $e) {
-                //? Ocurre cuando hay un error fatal 
                 error_log('Error: ' . $e->getMessage());
-                $message = $development_mode ?  $e->getMessage() : $user_message;
-                echo json_encode(['status' => 'error', 'message' => $message]);
+                echo json_encode(['status' => 'error', 'message' => 'Error inesperado']);
             }
-        break;  
+            break;
     }
 ?>

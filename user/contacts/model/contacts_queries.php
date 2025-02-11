@@ -116,30 +116,30 @@
         }    
     }     
     
-    function create_contact($db, $contact_fullname, $contact_mobile, $contact_email, $contact_company) {
-        try{
-            $query = 'INSERT INTO user_contacts (contact_fullname, contact_mobile, contact_email, contact_company) 
-            VALUES (:contact_fullname, :contact_mobile, :contact_email, :contact_company)';
-
+    function create_contact($db, $contact_fullname, $contact_mobile, $contact_email, $contact_company, $image_path) {
+        try {
+            $query = 'INSERT INTO user_contacts (contact_fullname, contact_mobile, contact_email, contact_company, image_path) 
+                      VALUES (:contact_fullname, :contact_mobile, :contact_email, :contact_company, :image_path)';
+    
             $statement = $db->prepare($query);
             $statement->bindValue(':contact_fullname', $contact_fullname, PDO::PARAM_STR);
             $statement->bindValue(':contact_mobile', $contact_mobile, PDO::PARAM_STR);
             $statement->bindValue(':contact_email', $contact_email, PDO::PARAM_STR);
             $statement->bindValue(':contact_company', $contact_company, PDO::PARAM_STR);
-
+            $statement->bindValue(':image_path', $image_path, PDO::PARAM_STR);
+    
             $success = $statement->execute();
             $statement->closeCursor();
-
+    
             return $success;
-        }catch (PDOException $e) {
-            //? Genera un error cuando hay problema con la solicitud del query a la base datos
-            error_log("Database error in fetch_variable_data: " . $e->getMessage());
+        } catch (PDOException $e) {
+            error_log("Database error in create_contact: " . $e->getMessage());
             throw $e;
         } catch (Exception $e) {
-            //? generar error cuando hay error de sintaxis o cualquier otro tipo de error
-            error_log("Error in fetch_variable_data: " . $e->getMessage());
+            error_log("Error in create_contact: " . $e->getMessage());
             throw $e;
         }
     }
+    
     
 ?>
